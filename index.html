@@ -29,7 +29,6 @@
                     </p>
                 </div>
             </div>
-            <!-- Botón Modo Súper / Ayuda -->
             <button onclick="toggleSuperMode()" id="btn-super" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-store text-amber-400"></i> Modo Súper
             </button>
@@ -39,7 +38,7 @@
     <!-- Contenido Principal -->
     <main class="max-w-2xl mx-auto p-4 space-y-6">
 
-        <!-- ================= SECCIÓN 1: LISTA DE LA COMPRA ================= -->
+        <!-- SECCIÓN 1: LISTA DE LA COMPRA -->
         <section id="tab-compra" class="space-y-4">
             <div class="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800 shadow-sm">
                 <div>
@@ -48,14 +47,14 @@
                     </h2>
                     <p class="text-xs text-slate-400">Toca para marcar o pulsa el micro para dictar.</p>
                 </div>
-                <div class="flex gap-2">
+                <div>
                     <button onclick="vaciarComprados()" class="text-xs bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 border border-slate-700 px-3 py-1.5 rounded-xl transition font-semibold">
                         Limpiar
                     </button>
                 </div>
             </div>
 
-            <!-- Input rápido y Micrófono -->
+            <!-- Input y Micrófono -->
             <div class="flex gap-2">
                 <div class="relative flex-1">
                     <input type="text" id="nuevo-item-input" placeholder="Añadir algo (ej. 2 leches, pan...)" onkeypress="if(event.key === 'Enter') agregarItemCompra()" class="w-full bg-slate-900 border border-slate-700 rounded-2xl pl-4 pr-10 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-medium">
@@ -68,56 +67,45 @@
                 </button>
             </div>
 
-            <!-- Sugerencias rápidas de historial -->
-            <div id="sugerencias-container" class="flex gap-2 overflow-x-auto pb-1 text-xs">
-                <!-- Dinámico -->
-            </div>
+            <!-- Sugerencias rápidas -->
+            <div id="sugerencias-container" class="flex gap-2 overflow-x-auto pb-1 text-xs"></div>
 
-            <!-- Lista de elementos de compra -->
-            <div id="lista-compra-items" class="space-y-2.5">
-                <!-- Dinámico -->
-            </div>
+            <!-- Lista de compra -->
+            <div id="lista-compra-items" class="space-y-2.5"></div>
 
-            <!-- Botón Compartir WhatsApp -->
+            <!-- Botón WhatsApp -->
             <button onclick="compartirWhatsApp()" class="w-full bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/30 font-bold py-3 px-4 rounded-2xl transition flex items-center justify-center gap-2 text-sm mt-4">
                 <i class="fa-brands fa-whatsapp text-lg"></i> Enviar lista por WhatsApp
             </button>
         </section>
 
-        <!-- ================= SECCIÓN 2: DESPENSA / QUÉ HAY EN CASA ================= -->
+        <!-- SECCIÓN 2: DESPENSA -->
         <section id="tab-despensa" class="hidden space-y-4">
             <div class="bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-900/40 p-4 rounded-2xl space-y-3">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-house-chimney text-indigo-400"></i> Inventario en Casa
-                        </h2>
-                        <p class="text-xs text-slate-400">Controla qué hay, qué queda poco y qué falta.</p>
-                    </div>
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-house-chimney text-indigo-400"></i> Inventario en Casa
+                    </h2>
+                    <p class="text-xs text-slate-400">Controla qué hay, qué queda poco y qué falta.</p>
                 </div>
-                <!-- Botón Mágico -->
                 <button onclick="botonMagicoPasarAFaltantes()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-wand-magic-sparkles text-base"></i> Añadir faltantes a la lista de compra
                 </button>
             </div>
 
-            <!-- Añadir producto nuevo a despensa -->
             <div class="flex gap-2">
-                <input type="text" id="nuevo-producto-despensa" placeholder="Nuevo producto (ej. Aceite de oliva, Café...)" onkeypress="if(event.key === 'Enter') agregarProductoDespensa()" class="flex-1 bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-medium">
+                <input type="text" id="nuevo-producto-despensa" placeholder="Nuevo producto (ej. Aceite, Café...)" onkeypress="if(event.key === 'Enter') agregarProductoDespensa()" class="flex-1 bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-medium">
                 <button onclick="agregarProductoDespensa()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-2xl text-sm transition">
                     Añadir
                 </button>
             </div>
 
-            <!-- Lista de Despensa -->
-            <div id="lista-despensa-items" class="space-y-2.5">
-                <!-- Dinámico -->
-            </div>
+            <div id="lista-despensa-items" class="space-y-2.5"></div>
         </section>
 
     </main>
 
-    <!-- Navegación Inferior Estilo App -->
+    <!-- Navegación Inferior -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 p-2 z-50 shadow-2xl">
         <div class="max-w-2xl mx-auto grid grid-cols-2 gap-2">
             <button onclick="switchTab('compra')" id="nav-btn-compra" class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold text-xs transition border border-emerald-500/20">
@@ -131,22 +119,18 @@
         </div>
     </nav>
 
-    <!-- JavaScript de la App -->
     <script>
-        // Estado local de la aplicación
         let appData = JSON.parse(localStorage.getItem('despensa_app_data')) || {
             compra: [
                 { id: 1, texto: "Leche semidesnatada", comprado: false },
-                { id: 2, texto: "Pan de molde", comprado: false },
-                { id: 3, texto: "Café en grano", comprado: true }
+                { id: 2, texto: "Pan de molde", comprado: false }
             ],
             despensa: [
-                { id: 101, nombre: "Leche", estado: "no" }, // hay, poco, no
+                { id: 101, nombre: "Leche", estado: "no" },
                 { id: 102, nombre: "Aceite de Oliva", estado: "poco" },
-                { id: 103, nombre: "Arroz", estado: "hay" },
-                { id: 104, nombre: "Café", estado: "no" }
+                { id: 103, nombre: "Arroz", estado: "hay" }
             ],
-            sugerenciasFrecuentes: ["Leche", "Pan", "Huevos", "Aceite", "Café", "Papel higiénico", "Fruta", "Tomates"]
+            sugerenciasFrecuentes: ["Leche", "Pan", "Huevos", "Aceite", "Café", "Papel higiénico", "Fruta"]
         };
 
         let superModeActive = false;
@@ -158,7 +142,6 @@
             renderSugerencias();
         }
 
-        // Navegación de pestañas
         function switchTab(tab) {
             const btnCompra = document.getElementById('nav-btn-compra');
             const btnDespensa = document.getElementById('nav-btn-despensa');
@@ -178,13 +161,12 @@
             }
         }
 
-        // --- GESTIÓN DE COMPRA ---
         function renderCompra() {
             const container = document.getElementById('lista-compra-items');
             container.innerHTML = '';
 
             if (appData.compra.length === 0) {
-                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm italic bg-slate-900/40 rounded-2xl border border-slate-800">La lista de la compra está vacía. ¡Añade algo!</div>';
+                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm italic bg-slate-900/40 rounded-2xl border border-slate-800">La lista está vacía.</div>';
                 return;
             }
 
@@ -217,12 +199,7 @@
             const texto = textoManual || input.value.trim();
             if (!texto) return;
 
-            appData.compra.push({
-                id: Date.now(),
-                texto: texto,
-                comprado: false
-            });
-
+            appData.compra.push({ id: Date.now(), texto: texto, comprado: false });
             if (!textoManual) input.value = '';
             guardarYRenderizar();
         }
@@ -243,7 +220,6 @@
             guardarYRenderizar();
         }
 
-        // Sugerencias rápidas
         function renderSugerencias() {
             const container = document.getElementById('sugerencias-container');
             container.innerHTML = '';
@@ -256,13 +232,12 @@
             });
         }
 
-        // --- GESTIÓN DE DESPENSA ---
         function renderDespensa() {
             const container = document.getElementById('lista-despensa-items');
             container.innerHTML = '';
 
             if (appData.despensa.length === 0) {
-                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm italic bg-slate-900/40 rounded-2xl border border-slate-800">No hay productos en la despensa.</div>';
+                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm italic bg-slate-900/40 rounded-2xl border border-slate-800">No hay productos en despensa.</div>';
                 return;
             }
 
@@ -270,7 +245,6 @@
                 const div = document.createElement('div');
                 div.className = "bg-slate-900/80 border border-slate-700/80 p-3.5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-3";
 
-                let estadoHtml = '';
                 const estados = [
                     { key: 'hay', label: 'Hay', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' },
                     { key: 'poco', label: 'Queda poco', color: 'bg-amber-500/20 text-amber-400 border-amber-500/40' },
@@ -302,12 +276,7 @@
             const nombre = input.value.trim();
             if (!nombre) return;
 
-            appData.despensa.push({
-                id: Date.now(),
-                nombre: nombre,
-                estado: 'hay'
-            });
-
+            appData.despensa.push({ id: Date.now(), nombre: nombre, estado: 'hay' });
             input.value = '';
             guardarYRenderizar();
         }
@@ -323,76 +292,49 @@
             guardarYRenderizar();
         }
 
-        // Botón Mágico: pasa lo que está en 'no' o 'poco' directamente a la lista de compra
         function botonMagicoPasarAFaltantes() {
             let añadidos = 0;
             appData.despensa.forEach(prod => {
                 if (prod.estado === 'no' || prod.estado === 'poco') {
-                    // Comprobar si ya está en la compra activa
                     const yaExiste = appData.compra.some(c => c.texto.toLowerCase() === prod.nombre.toLowerCase() && !c.comprado);
                     if (!yaExiste) {
-                        appData.compra.push({
-                            id: Date.now() + Math.random(),
-                            texto: prod.nombre,
-                            comprado: false
-                        });
+                        appData.compra.push({ id: Date.now() + Math.random(), texto: prod.nombre, comprado: false });
                         añadidos++;
                     }
                 }
             });
-
             guardarYRenderizar();
-            alert(añadidos > 0 ? `¡Listo! Se han añadido ${añadidos} productos faltantes a la lista de la compra.` : "¡Todo en orden! No hay productos marcados como agotados o escasos.");
+            alert(añadidos > 0 ? `¡Se han añadido ${añadidos} productos faltantes a la lista!` : "No hay productos marcados como agotados.");
         }
 
-        // Dictado por voz (Micrófono)
         function startVoiceRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert("Tu navegador no soporta el dictado por voz. Puedes escribirlo directamente.");
+                alert("Tu navegador no soporta dictado por voz.");
                 return;
             }
-
             const recognition = new SpeechRecognition();
             recognition.lang = 'es-ES';
-            const btnMic = document.getElementById('btn-mic');
-            btnMic.className = "absolute right-3 top-3 text-emerald-400 p-1 text-base animate-bounce";
-
             recognition.onresult = (event) => {
-                const spokenText = event.results[0][0].transcript;
-                btnMic.className = "absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition";
-                // Si dice varios productos separados por comas o 'y', los podemos añadir
-                agregarItemCompra(spokenText);
+                agregarItemCompra(event.results[0][0].transcript);
             };
-
-            recognition.onerror = () => {
-                btnMic.className = "absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition";
-            };
-
-            recognition.onend = () => {
-                btnMic.className = "absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition";
-            };
-
             recognition.start();
         }
 
-        // Compartir WhatsApp
         function compartirWhatsApp() {
             const pendientes = appData.compra.filter(i => !i.comprado).map(i => "• " + i.texto).join('%0A');
             if (!pendientes) {
-                alert("No hay productos pendientes en la lista para compartir.");
+                alert("No hay productos pendientes.");
                 return;
             }
-            const mensaje = "🛒 *Lista de la Compra:*%0A" + pendientes;
-            window.open(`https://api.whatsapp.com/send?text=${mensaje}`, '_blank');
+            window.open(`https://api.whatsapp.com/send?text=🛒 *Lista de Compra:*%0A${pendientes}`, '_blank');
         }
 
-        // Modo Súper (visibilidad grande)
         function toggleSuperMode() {
             superModeActive = !superModeActive;
             const btn = document.getElementById('btn-super');
             if (superModeActive) {
-                btn.className = "bg-amber-500 text-slate-950 border border-amber-400 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-amber-500/20";
+                btn.className = "bg-amber-500 text-slate-950 border border-amber-400 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg";
                 btn.innerHTML = '<i class="fa-solid fa-store"></i> Modo Súper ACTIVO';
             } else {
                 btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition";
@@ -401,36 +343,9 @@
             renderCompra();
         }
 
-        // Inicializar
         window.addEventListener('DOMContentLoaded', () => {
             guardarYRenderizar();
         });
     </script>
 </body>
 </html>
-"""
-
-manifest_json = """{
-  "name": "Despensa y Compra",
-  "short_name": "Compra",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#020617",
-  "icons": [
-    {
-      "src": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/basket-shopping.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
-    }
-  ]
-}
-"""
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_app)
-
-with open("manifest.json", "w", encoding="utf-8") as f:
-    f.write(manifest_json)
-
-print("App files generated successfully.")
