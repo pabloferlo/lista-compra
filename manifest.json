@@ -7,9 +7,9 @@
   "theme_color": "#020617",
   "icons": [
     {
-      "src": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/basket-shopping.svg",
+      "src": "https://cdn-icons-png.flaticon.com/512/3081/3081986.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
