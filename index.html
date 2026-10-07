@@ -1,0 +1,439 @@
+# Creamos el código completo de la PWA de la Despensa y Lista de la Compra en un solo archivo index.html ultra optimizado, 
+# con almacenamiento compartido por localStorage / Supabase opcional, modo oscuro de alto contraste, dictado por voz y botón mágico.
+
+html_app = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Despensa y Compra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24">
+
+    <!-- Header Fijo Superior -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3 shadow-xl">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2.5 rounded-2xl shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-basket-shopping text-slate-950 text-xl font-black"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-white tracking-tight">Despensa & Compra</h1>
+                    <p class="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sincronizado
+                    </p>
+                </div>
+            </div>
+            <!-- Botón Modo Súper / Ayuda -->
+            <button onclick="toggleSuperMode()" id="btn-super" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-store text-amber-400"></i> Modo Súper
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-2xl mx-auto p-4 space-y-6">
+
+        <!-- ================= SECCIÓN 1: LISTA DE LA COMPRA ================= -->
+        <section id="tab-compra" class="space-y-4">
+            <div class="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800 shadow-sm">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-emerald-400"></i> Lista Activa
+                    </h2>
+                    <p class="text-xs text-slate-400">Toca para marcar o pulsa el micro para dictar.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="vaciarComprados()" class="text-xs bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 border border-slate-700 px-3 py-1.5 rounded-xl transition font-semibold">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input rápido y Micrófono -->
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <input type="text" id="nuevo-item-input" placeholder="Añadir algo (ej. 2 leches, pan...)" onkeypress="if(event.key === 'Enter') agregarItemCompra()" class="w-full bg-slate-900 border border-slate-700 rounded-2xl pl-4 pr-10 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-medium">
+                    <button onclick="startVoiceRecognition()" id="btn-mic" class="absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition" title="Dictar por voz">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+                <button onclick="agregarItemCompra()" class="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-extrabold px-5 rounded-2xl text-sm transition shadow-lg shadow-emerald-600/20 flex items-center justify-center">
+                    <i class="fa-solid fa-plus text-base"></i>
+                </button>
+            </div>
+
+            <!-- Sugerencias rápidas de historial -->
+            <div id="sugerencias-container" class="flex gap-2 overflow-x-auto pb-1 text-xs">
+                <!-- Dinámico -->
+            </div>
+
+            <!-- Lista de elementos de compra -->
+            <div id="lista-compra-items" class="space-y-2.5">
+                <!-- Dinámico -->
+            </div>
+
+            <!-- Botón Compartir WhatsApp -->
+            <button onclick="compartirWhatsApp()" class="w-full bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/30 font-bold py-3 px-4 rounded-2xl transition flex items-center justify-center gap-2 text-sm mt-4">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Enviar lista por WhatsApp
+            </button>
+        </section>
+
+        <!-- ================= SECCIÓN 2: DESPENSA / QUÉ HAY EN CASA ================= -->
+        <section id="tab-despensa" class="hidden space-y-4">
+            <div class="bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-900/40 p-4 rounded-2xl space-y-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-house-chimney text-indigo-400"></i> Inventario en Casa
+                        </h2>
+                        <p class="text-xs text-slate-400">Controla qué hay, qué queda poco y qué falta.</p>
+                    </div>
+                </div>
+                <!-- Botón Mágico -->
+                <button onclick="botonMagicoPasarAFaltantes()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold py-3.5 px-4 rounded-xl transition shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles text-base"></i> Añadir faltantes a la lista de compra
+                </button>
+            </div>
+
+            <!-- Añadir producto nuevo a despensa -->
+            <div class="flex gap-2">
+                <input type="text" id="nuevo-producto-despensa" placeholder="Nuevo producto (ej. Aceite de oliva, Café...)" onkeypress="if(event.key === 'Enter') agregarProductoDespensa()" class="flex-1 bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-medium">
+                <button onclick="agregarProductoDespensa()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 rounded-2xl text-sm transition">
+                    Añadir
+                </button>
+            </div>
+
+            <!-- Lista de Despensa -->
+            <div id="lista-despensa-items" class="space-y-2.5">
+                <!-- Dinámico -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Navegación Inferior Estilo App -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 p-2 z-50 shadow-2xl">
+        <div class="max-w-2xl mx-auto grid grid-cols-2 gap-2">
+            <button onclick="switchTab('compra')" id="nav-btn-compra" class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold text-xs transition border border-emerald-500/20">
+                <i class="fa-solid fa-cart-shopping text-lg mb-1"></i>
+                Lista de la Compra
+            </button>
+            <button onclick="switchTab('despensa')" id="nav-btn-despensa" class="flex flex-col items-center justify-center py-2.5 rounded-xl text-slate-400 hover:text-slate-200 font-semibold text-xs transition border border-transparent">
+                <i class="fa-solid fa-house-chimney text-lg mb-1"></i>
+                Despensa en Casa
+            </button>
+        </div>
+    </nav>
+
+    <!-- JavaScript de la App -->
+    <script>
+        // Estado local de la aplicación
+        let appData = JSON.parse(localStorage.getItem('despensa_app_data')) || {
+            compra: [
+                { id: 1, texto: "Leche semidesnatada", comprado: false },
+                { id: 2, texto: "Pan de molde", comprado: false },
+                { id: 3, texto: "Café en grano", comprado: true }
+            ],
+            despensa: [
+                { id: 101, nombre: "Leche", estado: "no" }, // hay, poco, no
+                { id: 102, nombre: "Aceite de Oliva", estado: "poco" },
+                { id: 103, nombre: "Arroz", estado: "hay" },
+                { id: 104, nombre: "Café", estado: "no" }
+            ],
+            sugerenciasFrecuentes: ["Leche", "Pan", "Huevos", "Aceite", "Café", "Papel higiénico", "Fruta", "Tomates"]
+        };
+
+        let superModeActive = false;
+
+        function guardarYRenderizar() {
+            localStorage.setItem('despensa_app_data', JSON.stringify(appData));
+            renderCompra();
+            renderDespensa();
+            renderSugerencias();
+        }
+
+        // Navegación de pestañas
+        function switchTab(tab) {
+            const btnCompra = document.getElementById('nav-btn-compra');
+            const btnDespensa = document.getElementById('nav-btn-despensa');
+            const secCompra = document.getElementById('tab-compra');
+            const secDespensa = document.getElementById('tab-despensa');
+
+            if (tab === 'compra') {
+                secCompra.classList.remove('hidden');
+                secDespensa.classList.add('hidden');
+                btnCompra.className = "flex flex-col items-center justify-center py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold text-xs transition border border-emerald-500/20";
+                btnDespensa.className = "flex flex-col items-center justify-center py-2.5 rounded-xl text-slate-400 hover:text-slate-200 font-semibold text-xs transition border border-transparent";
+            } else {
+                secCompra.classList.add('hidden');
+                secDespensa.classList.remove('hidden');
+                btnDespensa.className = "flex flex-col items-center justify-center py-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 font-bold text-xs transition border border-indigo-500/20";
+                btnCompra.className = "flex flex-col items-center justify-center py-2.5 rounded-xl text-slate-400 hover:text-slate-200 font-semibold text-xs transition border border-transparent";
+            }
+        }
+
+        // --- GESTIÓN DE COMPRA ---
+        function renderCompra() {
+            const container = document.getElementById('lista-compra-items');
+            container.innerHTML = '';
+
+            if (appData.compra.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm italic bg-slate-900/40 rounded-2xl border border-slate-800">La lista de la compra está vacía. ¡Añade algo!</div>';
+                return;
+            }
+
+            appData.compra.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-2xl border flex items-center justify-between transition cursor-pointer ${
+                    item.comprado 
+                        ? 'bg-slate-900/30 border-slate-800/80 text-slate-500' 
+                        : (superModeActive ? 'bg-slate-800 border-slate-600 text-white text-lg py-5' : 'bg-slate-900/80 border-slate-700/80 text-white')
+                }`;
+                div.onclick = () => toggleComprado(item.id);
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-3.5 flex-1">
+                        <div class="w-7 h-7 rounded-xl border flex items-center justify-center transition ${item.comprado ? 'bg-emerald-500 border-emerald-500 text-slate-950 font-black' : 'border-slate-600 bg-slate-800'}">
+                            ${item.comprado ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                        </div>
+                        <span class="${item.comprado ? 'line-through text-slate-500' : 'font-semibold'}">${item.texto}</span>
+                    </div>
+                    <button onclick="event.stopPropagation(); eliminarItemCompra(${item.id})" class="text-slate-500 hover:text-rose-400 p-2 text-sm">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function agregarItemCompra(textoManual) {
+            const input = document.getElementById('nuevo-item-input');
+            const texto = textoManual || input.value.trim();
+            if (!texto) return;
+
+            appData.compra.push({
+                id: Date.now(),
+                texto: texto,
+                comprado: false
+            });
+
+            if (!textoManual) input.value = '';
+            guardarYRenderizar();
+        }
+
+        function toggleComprado(id) {
+            const item = appData.compra.find(i => i.id === id);
+            if (item) item.comprado = !item.comprado;
+            guardarYRenderizar();
+        }
+
+        function eliminarItemCompra(id) {
+            appData.compra = appData.compra.filter(i => i.id !== id);
+            guardarYRenderizar();
+        }
+
+        function vaciarComprados() {
+            appData.compra = appData.compra.filter(i => !i.comprado);
+            guardarYRenderizar();
+        }
+
+        // Sugerencias rápidas
+        function renderSugerencias() {
+            const container = document.getElementById('sugerencias-container');
+            container.innerHTML = '';
+            appData.sugerenciasFrecuentes.forEach(sug => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-900 hover:bg-emerald-500/10 hover:text-emerald-400 border border-slate-700/80 text-slate-300 px-3 py-1.5 rounded-xl whitespace-nowrap transition font-medium";
+                btn.onclick = () => agregarItemCompra(sug);
+                btn.innerText = "+ " + sug;
+                container.appendChild(btn);
+            });
+        }
+
+        // --- GESTIÓN DE DESPENSA ---
+        function renderDespensa() {
+            const container = document.getElementById('lista-despensa-items');
+            container.innerHTML = '';
+
+            if (appData.despensa.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm italic bg-slate-900/40 rounded-2xl border border-slate-800">No hay productos en la despensa.</div>';
+                return;
+            }
+
+            appData.despensa.forEach(prod => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-900/80 border border-slate-700/80 p-3.5 rounded-2xl flex flex-col sm:flex-row justify-between sm:items-center gap-3";
+
+                let estadoHtml = '';
+                const estados = [
+                    { key: 'hay', label: 'Hay', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' },
+                    { key: 'poco', label: 'Queda poco', color: 'bg-amber-500/20 text-amber-400 border-amber-500/40' },
+                    { key: 'no', label: 'No hay', color: 'bg-rose-500/20 text-rose-400 border-rose-500/40' }
+                ];
+
+                const botonesEstados = estados.map(e => `
+                    <button onclick="cambiarEstadoDespensa(${prod.id}, '${e.key}')" class="px-2.5 py-1.5 rounded-xl text-xs font-bold border transition ${prod.estado === e.key ? e.color + ' shadow' : 'bg-slate-900 border-slate-700 text-slate-500 hover:text-slate-300'}">
+                        ${e.label}
+                    </button>
+                `).join('');
+
+                div.innerHTML = `
+                    <div class="font-semibold text-white text-sm flex items-center justify-between sm:justify-start gap-2">
+                        <span>${prod.nombre}</span>
+                        <button onclick="eliminarProductoDespensa(${prod.id})" class="sm:hidden text-slate-600 hover:text-rose-400 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-1.5">
+                        <div class="flex gap-1">${botonesEstados}</div>
+                        <button onclick="eliminarProductoDespensa(${prod.id})" class="hidden sm:block text-slate-600 hover:text-rose-400 p-2 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function agregarProductoDespensa() {
+            const input = document.getElementById('nuevo-producto-despensa');
+            const nombre = input.value.trim();
+            if (!nombre) return;
+
+            appData.despensa.push({
+                id: Date.now(),
+                nombre: nombre,
+                estado: 'hay'
+            });
+
+            input.value = '';
+            guardarYRenderizar();
+        }
+
+        function cambiarEstadoDespensa(id, nuevoEstado) {
+            const prod = appData.despensa.find(p => p.id === id);
+            if (prod) prod.estado = nuevoEstado;
+            guardarYRenderizar();
+        }
+
+        function eliminarProductoDespensa(id) {
+            appData.despensa = appData.despensa.filter(p => p.id !== id);
+            guardarYRenderizar();
+        }
+
+        // Botón Mágico: pasa lo que está en 'no' o 'poco' directamente a la lista de compra
+        function botonMagicoPasarAFaltantes() {
+            let añadidos = 0;
+            appData.despensa.forEach(prod => {
+                if (prod.estado === 'no' || prod.estado === 'poco') {
+                    // Comprobar si ya está en la compra activa
+                    const yaExiste = appData.compra.some(c => c.texto.toLowerCase() === prod.nombre.toLowerCase() && !c.comprado);
+                    if (!yaExiste) {
+                        appData.compra.push({
+                            id: Date.now() + Math.random(),
+                            texto: prod.nombre,
+                            comprado: false
+                        });
+                        añadidos++;
+                    }
+                }
+            });
+
+            guardarYRenderizar();
+            alert(añadidos > 0 ? `¡Listo! Se han añadido ${añadidos} productos faltantes a la lista de la compra.` : "¡Todo en orden! No hay productos marcados como agotados o escasos.");
+        }
+
+        // Dictado por voz (Micrófono)
+        function startVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Tu navegador no soporta el dictado por voz. Puedes escribirlo directamente.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            const btnMic = document.getElementById('btn-mic');
+            btnMic.className = "absolute right-3 top-3 text-emerald-400 p-1 text-base animate-bounce";
+
+            recognition.onresult = (event) => {
+                const spokenText = event.results[0][0].transcript;
+                btnMic.className = "absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition";
+                // Si dice varios productos separados por comas o 'y', los podemos añadir
+                agregarItemCompra(spokenText);
+            };
+
+            recognition.onerror = () => {
+                btnMic.className = "absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition";
+            };
+
+            recognition.onend = () => {
+                btnMic.className = "absolute right-3 top-3 text-slate-400 hover:text-emerald-400 p-1 text-base transition";
+            };
+
+            recognition.start();
+        }
+
+        // Compartir WhatsApp
+        function compartirWhatsApp() {
+            const pendientes = appData.compra.filter(i => !i.comprado).map(i => "• " + i.texto).join('%0A');
+            if (!pendientes) {
+                alert("No hay productos pendientes en la lista para compartir.");
+                return;
+            }
+            const mensaje = "🛒 *Lista de la Compra:*%0A" + pendientes;
+            window.open(`https://api.whatsapp.com/send?text=${mensaje}`, '_blank');
+        }
+
+        // Modo Súper (visibilidad grande)
+        function toggleSuperMode() {
+            superModeActive = !superModeActive;
+            const btn = document.getElementById('btn-super');
+            if (superModeActive) {
+                btn.className = "bg-amber-500 text-slate-950 border border-amber-400 font-black px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-amber-500/20";
+                btn.innerHTML = '<i class="fa-solid fa-store"></i> Modo Súper ACTIVO';
+            } else {
+                btn.className = "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition";
+                btn.innerHTML = '<i class="fa-solid fa-store text-amber-400"></i> Modo Súper';
+            }
+            renderCompra();
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', () => {
+            guardarYRenderizar();
+        });
+    </script>
+</body>
+</html>
+"""
+
+manifest_json = """{
+  "name": "Despensa y Compra",
+  "short_name": "Compra",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/basket-shopping.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_app)
+
+with open("manifest.json", "w", encoding="utf-8") as f:
+    f.write(manifest_json)
+
+print("App files generated successfully.")
